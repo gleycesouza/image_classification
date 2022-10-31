@@ -171,7 +171,7 @@ uploaded_file = st.file_uploader("Select your picture...", type="jpg")
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
     # st.image(image, caption='Image uploaded', use_column_width=True)
-    
+    status = True
     buffer = io.BytesIO()     # create file in memory
     image.save(buffer, 'jpeg') # save in file in memory - it has to be `jpeg`, not `jpg`
     buffer.seek(0)            # move to the beginning of file
