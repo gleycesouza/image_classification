@@ -37,18 +37,18 @@ def set_png_as_page_bg(png_file):
     return
 
 header_html = "<img src='data:image/png;base64,{}' class='center' style='width: 130px; display: block;margin-left: auto; margin-right: auto;'>".format(
-    get_base64_of_bin_file("./imgs/benthic-logo.png")
+    get_base64_of_bin_file("./benthic-logo.png")
 )
 st.markdown(
     header_html, unsafe_allow_html=True,
 )
 
 st.markdown('<br><h3 style="color:black; text-align: center; margin-bottom: .1em;">Image Quality Evaluation</h3>', unsafe_allow_html=True)
-set_png_as_page_bg('./imgs/background.jpg')
+set_png_as_page_bg('./background.jpg')
 
 
 def cnn_luz_classification(img):
-    cnn_luz_final = keras.models.load_model('weights/cnn_1.h5')
+    cnn_luz_final = keras.models.load_model('./cnn_1.h5')
 
     test_image_1 = tf.keras.utils.load_img(img, target_size = (64, 64))
     test_image_1 = tf.keras.utils.img_to_array(test_image_1)
@@ -66,7 +66,7 @@ def cnn_luz_classification(img):
     return prediction_luz,prob_luz
 
 def cnn_foco_classification(img):
-    cnn_foco_final = keras.models.load_model('weights/cnn_2.h5')
+    cnn_foco_final = keras.models.load_model('./cnn_2.h5')
 
     test_image_2 = tf.keras.utils.load_img(img, target_size = (64, 64))
     test_image_2 = tf.keras.utils.img_to_array(test_image_2)
@@ -83,7 +83,7 @@ def cnn_foco_classification(img):
     return prediction_foco,prob_foco
 
 def cnn_vibracao_classification(img):
-    cnn_vibracao_final = keras.models.load_model('weights/cnn_3.h5')
+    cnn_vibracao_final = keras.models.load_model('./cnn_3.h5')
 
     test_image_2 = tf.keras.utils.load_img(img, target_size = (64, 64))
     test_image_2 = tf.keras.utils.img_to_array(test_image_2)
@@ -100,7 +100,7 @@ def cnn_vibracao_classification(img):
     return prediction_vibracao,prob_vibracao
 
 def cnn_ring_light_classification(img):
-    cnn_ring_light_final = keras.models.load_model('weights/cnn_4.h5')
+    cnn_ring_light_final = keras.models.load_model('./cnn_4.h5')
 
     test_image_2 = tf.keras.utils.load_img(img, target_size = (64, 64))
     test_image_2 = tf.keras.utils.img_to_array(test_image_2)
@@ -117,7 +117,7 @@ def cnn_ring_light_classification(img):
     return prediction_ring_light,prob_ring_light
 
 def cnn_led_classification(img):
-    cnn_led_final = keras.models.load_model('weights/cnn_5.h5')
+    cnn_led_final = keras.models.load_model('./cnn_5.h5')
 
     test_image_2 = tf.keras.utils.load_img(img, target_size = (64, 64))
     test_image_2 = tf.keras.utils.img_to_array(test_image_2)
@@ -134,7 +134,7 @@ def cnn_led_classification(img):
     return prediction_led,prob_led
 
 def cnn_etiqueta_classification(img):
-    cnn_etiqueta_final = keras.models.load_model('weights/cnn_6.h5')
+    cnn_etiqueta_final = keras.models.load_model('./cnn_6.h5')
 
     test_image_2 = tf.keras.utils.load_img(img, target_size = (64, 64))
     test_image_2 = tf.keras.utils.img_to_array(test_image_2)
@@ -151,7 +151,7 @@ def cnn_etiqueta_classification(img):
     return prediction_etiqueta,prob_etiqueta
 
 def cnn_altura_classification(img):
-    cnn_altura_final = keras.models.load_model('weights/cnn_7.h5')
+    cnn_altura_final = keras.models.load_model('./cnn_7.h5')
 
     test_image_2 = tf.keras.utils.load_img(img, target_size = (64, 64))
     test_image_2 = tf.keras.utils.img_to_array(test_image_2)
@@ -177,6 +177,8 @@ if uploaded_file is not None:
     buffer.seek(0)            # move to the beginning of file
     bg_image = buffer         # use it without `open()`
 
+    element = st.markdown('<p style="color:white; text-align: center; margin-bottom: .1em;">Analyzing the image...</p>', unsafe_allow_html=True)
+    
     results = []
     results.append(cnn_luz_classification(bg_image))
     results.append(cnn_foco_classification(bg_image))
@@ -190,10 +192,19 @@ if uploaded_file is not None:
 
     results_items = [f'{p_tag} {r[0]} ({int(r[1])}%) </p>' for r in results]
     results_str = '\n'.join(results_items)
+    # image_result = st.image(image, caption='Image uploaded', use_column_width=True)
 
-    content = f'''<div style="background-color: white; border-radius: 10px; padding: 10px 0">
-        <h4 style="color:black; text-align: center; margin-bottom: .1em;">Results:</h4>
-        {results_str}
+    b64img = base64.b64encode(buffer.getvalue()).decode()
+    content = f'''
+    <div style="display: flex">
+        <div style="flex: 1; position: relative;border-radius: 5px;">
+            <img src='data:image/png;base64,{b64img}' class='center' style='padding-right:10px;display: block; margin: auto; max-width: 100%'>
+        </div>
+        <div style="flex: 1; background-color: white; border-radius: 5px; overflow: hidden;">
+            <p style="color:rgb(100,150,250); background-color: #eee; text-align: center; line-height:30px; margin-bottom: .1em;">Results</p>
+            {results_str}
+        </div>
     </div>'''
 
+    element.empty()
     st.markdown(content, unsafe_allow_html=True)
