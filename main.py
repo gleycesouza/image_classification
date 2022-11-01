@@ -37,14 +37,14 @@ def set_png_as_page_bg(png_file):
     return
 
 header_html = "<img src='data:image/png;base64,{}' class='center' style='width: 130px; display: block;margin-left: auto; margin-right: auto;'>".format(
-    get_base64_of_bin_file("imgs/benthic-logo.png")
+    get_base64_of_bin_file("./imgs/benthic-logo.png")
 )
 st.markdown(
     header_html, unsafe_allow_html=True,
 )
 
 st.markdown('<br><h3 style="color:black; text-align: center; margin-bottom: .1em;">Image Quality Evaluation</h3>', unsafe_allow_html=True)
-set_png_as_page_bg('imgs/background.jpg')
+set_png_as_page_bg('./imgs/background.jpg')
 
 
 def cnn_luz_classification(img):
