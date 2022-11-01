@@ -25,7 +25,7 @@ def set_png_as_page_bg(png_file):
     <style>
     .stApp {
     background-image: url("data:image/jpg;base64,%s");
-    opacity: 0.65;
+    opacity: 1;
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: scroll; # doesn't work
@@ -43,8 +43,8 @@ st.markdown(
     header_html, unsafe_allow_html=True,
 )
 
-st.markdown('<br><h3 style="color:black; text-align: center; margin-bottom: .1em;">Image Quality Evaluation</h3>', unsafe_allow_html=True)
-set_png_as_page_bg('./background.jpg')
+st.markdown('<br><h3 style="color:black; text-align: center;">Image Quality Assurance</h3>', unsafe_allow_html=True)
+set_png_as_page_bg('./background-overlay2.jpg')
 
 
 def cnn_luz_classification(img):
@@ -177,7 +177,7 @@ if uploaded_file is not None:
     buffer.seek(0)            # move to the beginning of file
     bg_image = buffer         # use it without `open()`
 
-    element = st.markdown('<p style="color:white; text-align: center; margin-bottom: .1em;">Analyzing the image...</p>', unsafe_allow_html=True)
+    element = st.markdown('<p style="color:black; text-align: center; margin-bottom: .1em;">Analyzing the image...</p>', unsafe_allow_html=True)
     
     results = []
     results.append(cnn_luz_classification(bg_image))
