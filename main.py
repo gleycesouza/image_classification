@@ -180,19 +180,25 @@ if uploaded_file is not None:
     element = st.markdown('<p style="color:black; text-align: center; margin-bottom: .1em;">Analyzing the image...</p>', unsafe_allow_html=True)
     
     results = []
-    results.append(cnn_luz_classification(bg_image))
-    results.append(cnn_foco_classification(bg_image))
-    results.append(cnn_vibracao_classification(bg_image))
     results.append(cnn_ring_light_classification(bg_image))
     results.append(cnn_led_classification(bg_image))
     results.append(cnn_etiqueta_classification(bg_image))
-    results.append(cnn_altura_classification(bg_image))
-
+    results.append(cnn_luz_classification(bg_image)) #mais ou menos
+    results.append(cnn_foco_classification(bg_image)) #mais ou menos
+    results.append(cnn_vibracao_classification(bg_image)) #mais ou menos
+    #results.append(cnn_altura_classification(bg_image))
+    
     p_tag = '<p style="color:black; text-align: center; margin-bottom: .1em;">'
 
     results_items = [f'{p_tag} {r[0]} ({int(r[1])}%) </p>' for r in results]
-    results_str = '\n'.join(results_items)
+
+    results_first = results_items[0:3]
+    results_str_1 = '\n'.join(results_first)
     # image_result = st.image(image, caption='Image uploaded', use_column_width=True)
+    
+    p_tag_orange = '<p style="color:#FFA500; text-align: center; margin-bottom: .1em;">'
+    results_second = results_items[3:]
+    results_str_2 = '\n'.join(results_second)
 
     b64img = base64.b64encode(buffer.getvalue()).decode()
     content = f'''
@@ -202,7 +208,9 @@ if uploaded_file is not None:
         </div>
         <div style="flex: 1; background-color: white; border-radius: 5px; overflow: hidden;">
             <p style="color:rgb(100,150,250); background-color: #eee; text-align: center; line-height:30px; margin-bottom: .1em;">Results</p>
-            {results_str}
+            {results_str_1}
+            <p style="color:rgb(255,140,0); background-color: #eee; text-align: center; line-height:30px; margin-bottom: .1em;">In progress...</p>
+            {results_str_2}
         </div>
     </div>'''
 
