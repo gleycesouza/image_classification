@@ -9,7 +9,7 @@ import numpy as np
 from keras.preprocessing import image
 from keras.models import load_model
 import io
-import cv2
+#import cv2
 from PIL import Image, ImageDraw, ImageFont
 
 # background image to streamlit
