@@ -9,7 +9,8 @@ import numpy as np
 from keras.preprocessing import image
 from keras.models import load_model
 import io
-
+import cv2
+from PIL import Image, ImageDraw, ImageFont
 
 # background image to streamlit
 
@@ -95,7 +96,7 @@ def cnn_vibracao_classification(img):
     if round(result_vibracao[0][0]) == 0:
         prediction_vibracao = ' Vibracao Ok'
     elif round(result_vibracao[0][0]) == 1:
-        prediction_vibracao = 'vibracao Ruim'
+        prediction_vibracao = 'Vibracao Ruim'
 
     return prediction_vibracao,prob_vibracao
 
@@ -167,7 +168,109 @@ def cnn_altura_classification(img):
 
     return prediction_altura,prob_altura
 
+def detect_circle_image(image_bytes):
+    # Load image
+    #image = cv2.imread(image_path)
+    #image = cv2.imdecode(np.frombuffer(image_bytes, np.uint8), cv2.IMREAD_COLOR)
+    nparr = np.frombuffer(image_bytes.getvalue(), np.uint8)
+    image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)                                  # Convert image to grayscale
+    blur = cv2.medianBlur(gray, 11)                                                 # Apply median blur to the image
+    thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]    # Apply Otsu's threshold to the image
+
+    # Create a morphological kernel and apply opening operation
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=3)
+
+    # Detect circles in the image
+    circles = cv2.HoughCircles(opening, cv2.HOUGH_GRADIENT, dp=1.1, minDist=10000, param1=200, param2=20, minRadius=1000, maxRadius=2000)
+
+    circles = np.uint16(np.around(circles))                                         # Change data type of the circles to int
+    x, y, r = circles[0][0][1], circles[0][0][0], circles[0][0][2]-20               # Select the first detected circle
+    cropped_image = image[x-r:x+r, y-r:y+r]                                         # Crop the image to fit the circle
+
+    # Create a white circle mask
+    mask = np.zeros(cropped_image.shape, dtype=np.uint8)
+    mask = cv2.circle(mask, (cropped_image.shape[0]-r, cropped_image.shape[1]-r), r, (255, 255, 255), -1) 
+    result = cv2.bitwise_and(mask, cropped_image)                                   # Apply the mask to the image
+
+    # Convert the result to PIL Image object 
+    result_image = Image.fromarray(result)
+    return result_image
+
+def resize_image(result_image, size_cm, dpi):
+    # Calculate the size in pixels
+    pixels = size_cm * dpi / 2.54
+    new_image = result_image.resize((int(pixels), int(pixels))) # Resize the image
+    
+    with io.BytesIO() as output:
+        new_image.save(output, format="JPEG")
+        img_bytes = output.getvalue()
+    return img_bytes
+
+def add_border(result_image_resized, border_size_cm, border_size_top_cm, dpi):
+    # Open the resized image as a PIL image
+    #image = Image.open(image_path)
+    image = Image.open(io.BytesIO(result_image_resized))
+
+    # Set the desired border size in pixels
+    right, left, bottom = (int(border_size_cm * dpi / 2.54) for _ in range(3))
+    top = int(border_size_top_cm * dpi / 2.54)
+
+    # Get the current image size
+    width, height = image.size
+
+    # Calculate the new size with the added borders
+    new_width = width + right + left
+    new_height = height + top + bottom
+
+    # Create a new image with the new size and black background
+    result = Image.new(image.mode, (new_width, new_height), (0, 0, 0))
+
+    # Paste the original image on the new image with the added borders
+    result.paste(image, (left, top))
+
+    return result
+
+def add_text_and_scale(result, furo, testemunho, secao, amostra, dpi):
+    # Open an Image
+    img = result
+
+    # Create an ImageDraw object
+    draw = ImageDraw.Draw(img)
+
+    # Define custom font style and font size
+    myFont_a = ImageFont.truetype('ARIAL.TTF', 65)
+    myFont = ImageFont.truetype('ARIALBD.TTF', 65)
+
+    # Define text to be added to the image
+    texts = [
+        (furo, 20, 20),
+        (testemunho, 1210, 20),
+        (secao, 1450, 20),
+        (amostra, 1650, 20)
+    ]
+    # Add Text to an image
+    for value, x, y in texts:
+        draw.text((x, y), value, font=myFont, fill='white')
+
+    # Draw a rectangle with the specified coordinates
+    x1, y1, x2, y2 = 1550, 1750, 1784, 1850
+    rec = ImageDraw.Draw(img)
+    rec.rectangle((x1, y1, x2, y2), fill='white')
+    print(1)
+    # Scale
+    draw.text((1590, 1762), "1 cm", font=myFont_a, fill='black')
+ 
+    # Save the edited image
+    buf = io.BytesIO()
+    img.save(buf, format='jpeg', dpi=(dpi, dpi), quality=95)
+    return buf.getvalue()
+
 uploaded_file = st.file_uploader("Select your picture...", type="jpg")
+#text_io = io.TextIOWrapper(uploaded_file)
+
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
     # st.image(image, caption='Image uploaded', use_column_width=True)
@@ -201,18 +304,56 @@ if uploaded_file is not None:
     results_str_2 = '\n'.join(results_second)
 
     b64img = base64.b64encode(buffer.getvalue()).decode()
+
     content = f'''
     <div style="display: flex">
         <div style="flex: 1; position: relative;border-radius: 5px;">
             <img src='data:image/png;base64,{b64img}' class='center' style='padding-right:10px;display: block; margin: auto; max-width: 100%'>
         </div>
         <div style="flex: 1; background-color: white; border-radius: 5px; overflow: hidden;">
-            <p style="color:rgb(100,150,250); background-color: #eee; text-align: center; line-height:30px; margin-bottom: .1em;">Results</p>
+            <p style="color:rgb(100,150,250); background-color: #eee; text-align: center; line-height:30px; margin-bottom: .1em;">Avaliação confiável:</p>
             {results_str_1}
-            <p style="color:rgb(255,140,0); background-color: #eee; text-align: center; line-height:30px; margin-bottom: .1em;">In progress...</p>
+            <p style="color:rgb(255,140,0); background-color: #eee; text-align: center; line-height:30px; margin-bottom: .1em;">Avaliação insegura:</p>
             {results_str_2}
         </div>
     </div>'''
 
     element.empty()
     st.markdown(content, unsafe_allow_html=True)
+
+#edição da imagem
+
+    def process_image():
+        element = st.markdown('<p style="color:black; text-align: center; margin-bottom: .1em;">Editing image...</p>', unsafe_allow_html=True)
+        image_circle = detect_circle_image(bg_image)
+        resized_image = resize_image(image_circle, 7.5, 600)
+        border_added_image = add_border(resized_image, 0.15,0.45,600)
+        final_img = add_text_and_scale(border_added_image, 'DGT-2155', 'T-01', 'S-A', 'A-04', 600)
+        
+        element.empty()
+
+        return final_img
+        # st.write("Downloading...")
+        #st.set_output_file("image.jpeg")
+        #st.write(final_img)
+        #st.set_output_file("")
+
+        #st.image(final_img, use_column_width=True)
+
+        #st.set_option('deprecation.showfileUploaderEncoding', False)
+        #st.set_option('deprecation.showfileUploader', False)
+        # st.file_downloader("Download Final Image", final_img, "final_image.jpeg")
+
+    # if st.button('Download Edited Image'):
+    #     process_image()
+
+    # st.download_button(
+    # label="Download Edited Image",
+    # data=process_image(),
+    # file_name='final_img.jpeg',
+    # mime='file',
+    # )
+    
+
+    
+
