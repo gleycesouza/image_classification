@@ -81,6 +81,7 @@ wrapt = "==1.14.1"
 zipp = "==3.9.0"
 streamlit = "*"
 opencv-python = "*"
+opencv-contrib-python = "*"
 
 [dev-packages]
 
