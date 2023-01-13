@@ -82,6 +82,7 @@ zipp = "==3.9.0"
 streamlit = "*"
 opencv-python = "*"
 opencv-contrib-python = "*"
+mesa = "*"
 
 [dev-packages]
 
