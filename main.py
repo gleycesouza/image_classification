@@ -9,8 +9,10 @@ import numpy as np
 from keras.preprocessing import image
 from keras.models import load_model
 import io
-#import cv2
+import cv2
 from PIL import Image, ImageDraw, ImageFont
+from google.protobuf import descriptor_pb2
+
 
 # background image to streamlit
 
@@ -259,13 +261,15 @@ def add_text_and_scale(result, furo, testemunho, secao, amostra, dpi):
     x1, y1, x2, y2 = 1550, 1750, 1784, 1850
     rec = ImageDraw.Draw(img)
     rec.rectangle((x1, y1, x2, y2), fill='white')
-    print(1)
+
     # Scale
     draw.text((1590, 1762), "1 cm", font=myFont_a, fill='black')
  
     # Save the edited image
     buf = io.BytesIO()
     img.save(buf, format='jpeg', dpi=(dpi, dpi), quality=95)
+    
+    # img.save("imagem_gerada.jpeg", format='jpeg', dpi=(dpi, dpi), quality=95)
     return buf.getvalue()
 
 uploaded_file = st.file_uploader("Select your picture...", type="jpg")
@@ -274,6 +278,7 @@ uploaded_file = st.file_uploader("Select your picture...", type="jpg")
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
     # st.image(image, caption='Image uploaded', use_column_width=True)
+    
     status = True
     buffer = io.BytesIO()     # create file in memory
     image.save(buffer, 'jpeg') # save in file in memory - it has to be `jpeg`, not `jpg`
@@ -297,20 +302,17 @@ if uploaded_file is not None:
 
     results_first = results_items[0:3]
     results_str_1 = '\n'.join(results_first)
-    # image_result = st.image(image, caption='Image uploaded', use_column_width=True)
-    
-    p_tag_orange = '<p style="color:#FFA500; text-align: center; margin-bottom: .1em;">'
     results_second = results_items[3:]
     results_str_2 = '\n'.join(results_second)
 
     b64img = base64.b64encode(buffer.getvalue()).decode()
-
+    
     content = f'''
     <div style="display: flex">
         <div style="flex: 1; position: relative;border-radius: 5px;">
             <img src='data:image/png;base64,{b64img}' class='center' style='padding-right:10px;display: block; margin: auto; max-width: 100%'>
         </div>
-        <div style="flex: 1; background-color: white; border-radius: 5px; overflow: hidden;">
+        <div style="flex: 1; background-color: white; border-radius: 5px; overflow: hidden; margin-bottom: .10em;">
             <p style="color:rgb(100,150,250); background-color: #eee; text-align: center; line-height:30px; margin-bottom: .1em;">Avaliação confiável:</p>
             {results_str_1}
             <p style="color:rgb(255,140,0); background-color: #eee; text-align: center; line-height:30px; margin-bottom: .1em;">Avaliação insegura:</p>
@@ -321,38 +323,42 @@ if uploaded_file is not None:
     element.empty()
     st.markdown(content, unsafe_allow_html=True)
 
-#edição da imagem
-
     def process_image():
-        element = st.markdown('<p style="color:black; text-align: center; margin-bottom: .1em;">Editing image...</p>', unsafe_allow_html=True)
-        image_circle = detect_circle_image(bg_image)
-        resized_image = resize_image(image_circle, 7.5, 600)
-        border_added_image = add_border(resized_image, 0.15,0.45,600)
-        final_img = add_text_and_scale(border_added_image, 'DGT-2155', 'T-01', 'S-A', 'A-04', 600)
         
-        element.empty()
+        if "visibility" not in st.session_state:
+            st.session_state.visibility = "visible"
+            st.session_state.disabled = False
 
-        return final_img
-        # st.write("Downloading...")
-        #st.set_output_file("image.jpeg")
-        #st.write(final_img)
-        #st.set_output_file("")
+        st.markdown('<br><h3 style="color:black; text-align: center;">Image editing (Under construction, do not use!)</h3>', unsafe_allow_html=True)
+        # st.markdown(content_text, unsafe_allow_html=True)
 
-        #st.image(final_img, use_column_width=True)
+        text_input = st.text_input(
+            "Scan or enter the information needed for editing. Example: DGT-2152,2A1,THI",
+            label_visibility=st.session_state.visibility,
+            disabled=st.session_state.disabled,
+        )
+        if text_input:
+            element = st.markdown('<p style="color:black; text-align: center; margin-bottom: .1em;">Editing image...</p>', unsafe_allow_html=True)
+        
+            text_input_list = text_input.split(",")
+            furo = text_input_list[0]
+            testemunho = 'T-0'+ text_input_list[1][0]
+            secao = 'S-'+ text_input_list[1][1]
+            amostra ='A-0'+ text_input_list[1][2]
 
-        #st.set_option('deprecation.showfileUploaderEncoding', False)
-        #st.set_option('deprecation.showfileUploader', False)
-        # st.file_downloader("Download Final Image", final_img, "final_image.jpeg")
+            image_circle = detect_circle_image(bg_image)
+            resized_image = resize_image(image_circle, 7.5, 600)
+            border_added_image = add_border(resized_image, 0.15,0.45,600)
+            final_img = add_text_and_scale(border_added_image, furo, testemunho, secao, amostra, 600)
+            image_name = furo+"_"+text_input_list[1]+"_T_num.jpeg"
 
-    # if st.button('Download Edited Image'):
-    #     process_image()
+            element.empty()
 
-    # st.download_button(
-    # label="Download Edited Image",
-    # data=process_image(),
-    # file_name='final_img.jpeg',
-    # mime='file',
-    # )
+            st.download_button('Download Edited Image', final_img, image_name)
+            # st.download_button('Download Edited Image', final_img, file_name='imagem_gerada.jpeg')
+
+    process_image()
+        
     
 
     
