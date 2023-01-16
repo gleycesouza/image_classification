@@ -263,7 +263,7 @@ def add_text_and_scale(result, furo, testemunho, secao, amostra, dpi):
     rec.rectangle((x1, y1, x2, y2), fill='white')
 
     # Scale
-    draw.text((2000, 2408), "1 cm", font=myFont_a, fill='black')
+    draw.text((2000, 2406), "1 cm", font=myFont_a, fill='black')
  
     # Save the edited image
     buf = io.BytesIO()
