@@ -243,8 +243,8 @@ def add_text_and_scale(result, furo, testemunho, secao, amostra, dpi):
     draw = ImageDraw.Draw(img)
 
     # Define custom font style and font size
-    myFont_a = ImageFont.truetype('ARIAL.TTF', 85.8)
-    myFont = ImageFont.truetype('ARIALBD.TTF', 85.8)
+    myFont_a = ImageFont.truetype('ARIAL.TTF', 86)
+    myFont = ImageFont.truetype('ARIALBD.TTF', 86)
 
     # Define text to be added to the image
     texts = [
