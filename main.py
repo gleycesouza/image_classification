@@ -203,7 +203,7 @@ def detect_circle_image(image_bytes):
 
 def resize_image(result_image, size_cm, dpi):
     # Calculate the size in pixels
-    pixels = size_cm * dpi / 2.54
+    pixels = size_cm * dpi / 1.9227
     new_image = result_image.resize((int(pixels), int(pixels))) # Resize the image
     
     with io.BytesIO() as output:
@@ -217,8 +217,8 @@ def add_border(result_image_resized, border_size_cm, border_size_top_cm, dpi):
     image = Image.open(io.BytesIO(result_image_resized))
 
     # Set the desired border size in pixels
-    right, left, bottom = (int(border_size_cm * dpi / 2.54) for _ in range(3))
-    top = int(border_size_top_cm * dpi / 2.54)
+    right, left, bottom = (int(border_size_cm * dpi / 1.9227) for _ in range(3))
+    top = int(border_size_top_cm * dpi / 1.9227)
 
     # Get the current image size
     width, height = image.size
