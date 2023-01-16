@@ -267,7 +267,7 @@ def add_text_and_scale(result, furo, testemunho, secao, amostra, dpi):
  
     # Save the edited image
     buf = io.BytesIO()
-    img.save(buf, format='jpg', dpi=(dpi, dpi), quality=95)
+    img.save(buf, format='jpeg', dpi=(dpi, dpi), quality=95)
     
     return buf.getvalue()
 
