@@ -243,22 +243,22 @@ def add_text_and_scale(result, furo, testemunho, secao, amostra, dpi):
     draw = ImageDraw.Draw(img)
 
     # Define custom font style and font size
-    myFont_a = ImageFont.truetype('ARIAL.TTF', 65)
-    myFont = ImageFont.truetype('ARIALBD.TTF', 65)
+    myFont_a = ImageFont.truetype('ARIAL.TTF', 85.8)
+    myFont = ImageFont.truetype('ARIALBD.TTF', 85.8)
 
     # Define text to be added to the image
     texts = [
         (furo, 20, 20),
-        (testemunho, 1210, 20),
-        (secao, 1450, 20),
-        (amostra, 1650, 20)
+        (testemunho, 1810, 20),
+        (secao, 2050, 20),
+        (amostra, 2250, 20)
     ]
     # Add Text to an image
     for value, x, y in texts:
         draw.text((x, y), value, font=myFont, fill='white')
 
     # Draw a rectangle with the specified coordinates
-    x1, y1, x2, y2 = 1550, 1750, 1784, 1850
+    x1, y1, x2, y2 = 1941, 1750, 2250, 1850
     rec = ImageDraw.Draw(img)
     rec.rectangle((x1, y1, x2, y2), fill='white')
 
