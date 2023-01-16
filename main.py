@@ -249,27 +249,26 @@ def add_text_and_scale(result, furo, testemunho, secao, amostra, dpi):
     # Define text to be added to the image
     texts = [
         (furo, 20, 20),
-        (testemunho, 1810, 20),
-        (secao, 2050, 20),
-        (amostra, 2250, 20)
+        (testemunho, 1790, 20),
+        (secao, 2030, 20),
+        (amostra, 2230, 20)
     ]
     # Add Text to an image
     for value, x, y in texts:
         draw.text((x, y), value, font=myFont, fill='white')
 
     # Draw a rectangle with the specified coordinates
-    x1, y1, x2, y2 = 1941, 1750, 2250, 1850
+    x1, y1, x2, y2 = 1941, 2400, 2250, 2500
     rec = ImageDraw.Draw(img)
     rec.rectangle((x1, y1, x2, y2), fill='white')
 
     # Scale
-    draw.text((1590, 1762), "1 cm", font=myFont_a, fill='black')
+    draw.text((1963, 2412), "1 cm", font=myFont_a, fill='black')
  
     # Save the edited image
     buf = io.BytesIO()
-    img.save(buf, format='jpeg', dpi=(dpi, dpi), quality=95)
+    img.save(buf, format='jpg', dpi=(dpi, dpi), quality=95)
     
-    # img.save("imagem_gerada.jpeg", format='jpeg', dpi=(dpi, dpi), quality=95)
     return buf.getvalue()
 
 uploaded_file = st.file_uploader("Select your picture...", type="jpg")
