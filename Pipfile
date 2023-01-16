@@ -80,9 +80,8 @@ werkzeug = "==2.2.2"
 wrapt = "==1.14.1"
 zipp = "==3.9.0"
 streamlit = "*"
-opencv-python = "*"
-opencv-contrib-python = "*"
 mesa = "*"
+opencv-python-headless = "==4.7.0.68"
 
 [dev-packages]
 
