@@ -258,12 +258,12 @@ def add_text_and_scale(result, furo, testemunho, secao, amostra, dpi):
         draw.text((x, y), value, font=myFont, fill='white')
 
     # Draw a rectangle with the specified coordinates
-    x1, y1, x2, y2 = 1941, 2400, 2250, 2500
+    x1, y1, x2, y2 = 1939, 2400, 2250, 2500
     rec = ImageDraw.Draw(img)
     rec.rectangle((x1, y1, x2, y2), fill='white')
 
     # Scale
-    draw.text((1963, 2412), "1 cm", font=myFont_a, fill='black')
+    draw.text((2000, 2408), "1 cm", font=myFont_a, fill='black')
  
     # Save the edited image
     buf = io.BytesIO()
