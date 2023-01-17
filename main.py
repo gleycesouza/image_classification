@@ -175,7 +175,7 @@ def detect_circle_image(image_bytes):
     #image = cv2.imread(image_path)
     #image = cv2.imdecode(np.frombuffer(image_bytes, np.uint8), cv2.IMREAD_COLOR)
     nparr = np.frombuffer(image_bytes.getvalue(), np.uint8)
-    image = cv2.imdecode(nparr, cv2.IMREAD_UNCHANGED)
+    image = cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR	)
 
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)                                  # Convert image to grayscale
     blur = cv2.medianBlur(gray, 11)                                                 # Apply median blur to the image
