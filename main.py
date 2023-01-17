@@ -12,7 +12,7 @@ import io
 import cv2
 from PIL import Image, ImageDraw, ImageFont
 from google.protobuf import descriptor_pb2
-
+import re
 
 # background image to streamlit
 
@@ -341,16 +341,29 @@ if uploaded_file is not None:
             element = st.markdown('<p style="color:black; text-align: center; margin-bottom: .1em;">Editing image...</p>', unsafe_allow_html=True)
         
             text_input_list = text_input.split(",")
+            
+            testemunho = re.split(re.compile(r'[ABC]'), text_input_list[1])[0]
+            amostra = re.split(re.compile(r'[ABC]'), text_input_list[1]) [1]
+            secao = re.findall(re.compile(r'[ABC]'), text_input_list[1])[0]
+
             furo = text_input_list[0]
-            testemunho = 'T-0'+ text_input_list[1][0]
-            secao = 'S-'+ text_input_list[1][1]
-            amostra ='A-0'+ text_input_list[1][2]
+            secao = 'S-'+ secao
+
+            if len(testemunho) == 1:
+                testemunho = 'T-0'+ testemunho
+            else:
+                testemunho = 'T-'+ testemunho
+
+            if len(amostra) == 1:
+                amostra = 'A-0'+ amostra
+            else:
+                amostra = 'A-'+ amostra
 
             image_circle = detect_circle_image(bg_image)
             resized_image = resize_image(image_circle, 7.5, 600)
             border_added_image = add_border(resized_image, 0.15,0.45,600)
             final_img = add_text_and_scale(border_added_image, furo, testemunho, secao, amostra, 600)
-            image_name = furo+"_"+text_input_list[1]+"_T_num.jpeg"
+            image_name = furo+"_"+text_input_list[1]+"_T_num.JPG"
 
             element.empty()
 
