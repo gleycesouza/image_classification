@@ -329,7 +329,7 @@ if uploaded_file is not None:
             st.session_state.visibility = "visible"
             st.session_state.disabled = False
 
-        st.markdown('<br><h3 style="color:black; text-align: center;">Image editing (Under construction, do not use!)</h3>', unsafe_allow_html=True)
+        st.markdown('<br><h3 style="color:black; text-align: center;">Image editing</h3>', unsafe_allow_html=True)
         # st.markdown(content_text, unsafe_allow_html=True)
 
         text_input = st.text_input(
@@ -347,6 +347,7 @@ if uploaded_file is not None:
             secao = re.findall(re.compile(r'[ABC]'), text_input_list[1])[0]
 
             furo = text_input_list[0]
+            ensaio = text_input_list[2]
             secao = 'S-'+ secao
 
             if len(testemunho) == 1:
@@ -363,7 +364,7 @@ if uploaded_file is not None:
             resized_image = resize_image(image_circle, 7.5, 600)
             border_added_image = add_border(resized_image, 0.15,0.45,600)
             final_img = add_text_and_scale(border_added_image, furo, testemunho, secao, amostra, 600)
-            image_name = furo+"_"+text_input_list[1]+"_T_num.JPG"
+            image_name = furo+"_"+text_input_list[1]+"_T_"+ ensaio +".JPG"
 
             element.empty()
 
