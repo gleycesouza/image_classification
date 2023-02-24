@@ -13,10 +13,9 @@ import cv2
 from PIL import Image, ImageDraw, ImageFont
 from google.protobuf import descriptor_pb2
 import re
+import pyzbar.pyzbar as pyzbar
 
-# background image to streamlit
-
-@st.cache(allow_output_mutation=True)
+@st.cache_data()
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, 'rb') as f:
         data = f.read()
@@ -272,6 +271,26 @@ def add_text_and_scale(result, furo, testemunho, secao, amostra, dpi):
     
     return buf.getvalue()
 
+def cropp_image(image):
+  cropped_image = image[2700:4500,1600:4500]
+  return cropped_image
+
+def read_qr_code(image_buffer):
+    # Carrega a imagem
+    #image = cv2.imread(image_path)
+    image = cv2.imdecode(np.frombuffer(image_buffer, np.uint8), cv2.IMREAD_COLOR)
+    image_cropped = cropp_image(image)
+    gray = cv2.cvtColor(image_cropped, cv2.COLOR_BGR2GRAY)
+    blur = cv2.medianBlur(gray, 11)
+    #cv2_imshow(blur)
+    # Encontra os códigos QR na imagem
+    codes = pyzbar.decode(blur)
+    
+    # Loop para ler todos os códigos QR encontrados
+    for code in codes:
+        result = code.data.decode("utf-8")
+        return result
+
 uploaded_file = st.file_uploader("Select your picture...", type="jpg")
 #text_io = io.TextIOWrapper(uploaded_file)
 
@@ -332,8 +351,11 @@ if uploaded_file is not None:
         st.markdown('<br><h3 style="color:black; text-align: center;">Image editing</h3>', unsafe_allow_html=True)
         # st.markdown(content_text, unsafe_allow_html=True)
 
+        predict_label = read_qr_code(bg_image.getvalue())
+
         text_input = st.text_input(
             "Scan or enter the information needed for editing. Example: DGT-2152,2A1,THI",
+            predict_label,
             label_visibility=st.session_state.visibility,
             disabled=st.session_state.disabled,
         )
@@ -341,12 +363,17 @@ if uploaded_file is not None:
             element = st.markdown('<p style="color:black; text-align: center; margin-bottom: .1em;">Editing image...</p>', unsafe_allow_html=True)
         
             text_input_list = text_input.split(",")
-            
+
+            if len(text_input_list) > 3:
+                text_input_list = text_input_list[-3:]
+                furo = text_input_list[0].split("\r\n")[1]
+            else:
+                furo = text_input_list[0]
+
             testemunho = re.split(re.compile(r'[ABC]'), text_input_list[1])[0]
             amostra = re.split(re.compile(r'[ABC]'), text_input_list[1]) [1]
             secao = re.findall(re.compile(r'[ABC]'), text_input_list[1])[0]
 
-            furo = text_input_list[0]
             ensaio = text_input_list[2]
             secao = 'S-'+ secao
 
@@ -364,6 +391,7 @@ if uploaded_file is not None:
             resized_image = resize_image(image_circle, 7.5, 600)
             border_added_image = add_border(resized_image, 0.15,0.45,600)
             final_img = add_text_and_scale(border_added_image, furo, testemunho, secao, amostra, 600)
+            
             image_name = furo+"_"+text_input_list[1]+"_T_"+ ensaio +".JPG"
 
             element.empty()

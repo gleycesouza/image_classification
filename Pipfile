@@ -82,6 +82,7 @@ zipp = "==3.9.0"
 streamlit = "*"
 mesa = "*"
 opencv-python-headless = "==4.7.0.68"
+pyzbar = "*"
 
 [dev-packages]
 
