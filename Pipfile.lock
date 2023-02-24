@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "cba6718b5b8c97eabf5df0354eb68c46a030b848d1f18e9fc6c3bf5a6af06a1e"
+            "sha256": "14c60a70ceb92400290361bd5ff0e6c74385e08e57571bbb17545f17ee037809"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -831,6 +831,9 @@
             "version": "==6.0"
         },
         "pyzbar": {
+            "extras": [
+                "scripts"
+            ],
             "hashes": [
                 "sha256:13e3ee5a2f3a545204a285f41814d5c0db571967e8d4af8699a03afc55182a9c",
                 "sha256:4559628b8192feb25766d954b36a3753baaf5c97c03135aec7e4a026036b475d",
