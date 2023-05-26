@@ -114,7 +114,7 @@ if uploaded_file is not None:
 
         predict_label = utils.read_qr_code(bg_image.getvalue())
         text_input = st.text_input(
-                "Scan or enter the information needed for editing. Example: DGT-2152,2A1,THI",
+                "Scan or enter the information needed for editing. Example: DGT-2152,2A1,TRX-CK0UE",
                 predict_label,
                 label_visibility=st.session_state.visibility,
                 disabled=st.session_state.disabled,
