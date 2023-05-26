@@ -27,4 +27,4 @@ Este é um projeto escrito em Python que utiliza o ambiente virtual pipenv para 
 
 - Caso a imagem seja classificada como boa e contenha um QR code, a imagem será editada com os textos lidos e será disponibilizá-da para download.
 
-Link do projeto na nuvem: https://gleycesouza-image-classification-main-ca86b4.streamlit.app/
+Link do projeto na nuvem: [benthic-smart-geotechnical-photos](https://benthic-smart-geotechnical-photos.streamlit.app/)
