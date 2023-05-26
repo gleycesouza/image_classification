@@ -46,9 +46,9 @@ def cnn_luz_classification(img):
         prob_luz = 100 - prob_luz
     # training_set_1.class_indices
     if round(result_1[0][0]) == 0:
-        prediction_luz = 'Light Ok'
+        prediction_luz = 'Illumination Ok'
     elif round(result_1[0][0]) == 1:
-        prediction_luz = 'Bad Light'
+        prediction_luz = 'Bad Illumination'
     return prediction_luz,prob_luz
 
 def cnn_foco_classification(img):
