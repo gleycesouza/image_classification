@@ -140,7 +140,7 @@ if uploaded_file is not None:
                 resized_image = utils.resize_image_rectangle(image_rectangle, 0.95, 600)
                 border_added_image = utils.add_border_rectangle(resized_image, 0.15, 0.65, 0.50, 600)
                 final_img = utils.add_text_and_scale_rectangle(border_added_image, furo, testemunho, secao, amostra, 600)
-                image_name = furo + "_" + TSA + "_T_" + ensaio + ".JPG"
+                image_name = furo + "_" + TSA + "_L_" + ensaio + ".JPG"
                 
             
             st.download_button('Download Edited Image', final_img, image_name)
