@@ -411,6 +411,8 @@ def read_qr_code(image_buffer):
         return result
 
 def process_text_input(text_input):
+    num = 0
+    
     text_input_list = text_input.split(",")
 
     if len(text_input_list) > 4:
