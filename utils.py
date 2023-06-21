@@ -413,11 +413,14 @@ def read_qr_code(image_buffer):
 def process_text_input(text_input):
     text_input_list = text_input.split(",")
 
-    if len(text_input_list) > 3:
+    if len(text_input_list) > 4:
         text_input_list = text_input_list[-3:]
         furo = text_input_list[0].split("\r\n")[1]
-    else:
-        furo = text_input_list[0]
+
+    elif len(text_input_list) == 4:
+        num = text_input_list[3]
+    
+    furo = text_input_list[0]
 
     testemunho = re.split(re.compile(r'[ABC]'), text_input_list[1])[0]
     amostra = re.split(re.compile(r'[ABC]'), text_input_list[1]) [1]
@@ -438,4 +441,4 @@ def process_text_input(text_input):
     
     TSA = text_input_list[1]
 
-    return (furo, testemunho, amostra, secao, ensaio,TSA)
+    return (furo, testemunho, amostra, secao, ensaio, TSA, num)

@@ -126,7 +126,7 @@ if uploaded_file is not None:
         elif text_input:
             element = st.markdown('<p style="color:black; text-align: center; margin-bottom: .1em;">Editing image...</p>', unsafe_allow_html=True)
         
-            furo, testemunho, amostra, secao, ensaio, TSA = utils.process_text_input(text_input)
+            furo, testemunho, amostra, secao, ensaio, TSA, num = utils.process_text_input(text_input)
 
             if option == 'Top':
                 image_circle = utils.detect_circle_image(bg_image)
