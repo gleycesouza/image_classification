@@ -34,7 +34,7 @@ def long_or_top(img):
     return result
 
 def cnn_luz_classification(img):
-    cnn_luz_final = keras.models.load_model('./cnn_1.h5')
+    cnn_luz_final = keras.models.load_model('./weights/cnn_1.h5')
 
     test_image_1 = tf.keras.utils.load_img(img, target_size = (64, 64))
     test_image_1 = tf.keras.utils.img_to_array(test_image_1)
@@ -52,7 +52,7 @@ def cnn_luz_classification(img):
     return prediction_luz,prob_luz
 
 def cnn_foco_classification(img):
-    cnn_foco_final = keras.models.load_model('./cnn_2.h5')
+    cnn_foco_final = keras.models.load_model('./weights/cnn_2.h5')
 
     test_image_2 = tf.keras.utils.load_img(img, target_size = (64, 64))
     test_image_2 = tf.keras.utils.img_to_array(test_image_2)
@@ -69,7 +69,7 @@ def cnn_foco_classification(img):
     return prediction_foco,prob_foco
 
 def cnn_vibracao_classification(img):
-    cnn_vibracao_final = keras.models.load_model('./cnn_3.h5')
+    cnn_vibracao_final = keras.models.load_model('./weights/cnn_3.h5')
 
     test_image_2 = tf.keras.utils.load_img(img, target_size = (64, 64))
     test_image_2 = tf.keras.utils.img_to_array(test_image_2)
@@ -86,7 +86,7 @@ def cnn_vibracao_classification(img):
     return prediction_vibracao,prob_vibracao
 
 def cnn_ring_light_classification(img):
-    cnn_ring_light_final = keras.models.load_model('./cnn_4.h5')
+    cnn_ring_light_final = keras.models.load_model('./weights/cnn_4.h5')
 
     test_image_2 = tf.keras.utils.load_img(img, target_size = (64, 64))
     test_image_2 = tf.keras.utils.img_to_array(test_image_2)
@@ -103,7 +103,7 @@ def cnn_ring_light_classification(img):
     return prediction_ring_light,prob_ring_light
 
 def cnn_led_classification(img):
-    cnn_led_final = keras.models.load_model('./cnn_5.h5')
+    cnn_led_final = keras.models.load_model('./weights/cnn_5.h5')
 
     test_image_2 = tf.keras.utils.load_img(img, target_size = (64, 64))
     test_image_2 = tf.keras.utils.img_to_array(test_image_2)
@@ -120,7 +120,7 @@ def cnn_led_classification(img):
     return prediction_led,prob_led
 
 def cnn_etiqueta_classification(img):
-    cnn_etiqueta_final = keras.models.load_model('./cnn_6.h5')
+    cnn_etiqueta_final = keras.models.load_model('./weights/cnn_6.h5')
 
     test_image_2 = tf.keras.utils.load_img(img, target_size = (64, 64))
     test_image_2 = tf.keras.utils.img_to_array(test_image_2)
@@ -137,7 +137,7 @@ def cnn_etiqueta_classification(img):
     return prediction_etiqueta,prob_etiqueta
 
 def cnn_altura_classification(img):
-    cnn_altura_final = keras.models.load_model('./cnn_7.h5')
+    cnn_altura_final = keras.models.load_model('./weights/cnn_7.h5')
 
     test_image_2 = tf.keras.utils.load_img(img, target_size = (64, 64))
     test_image_2 = tf.keras.utils.img_to_array(test_image_2)
@@ -183,7 +183,7 @@ def detect_circle_image(image_bytes):
     result_image = Image.fromarray(result)
     return result_image
 
-def detect_rectangle_image(image_bytes, centimeters_x, centimeters_y, dpi):
+def detect_rectangle_image(image_bytes, centimeters_x, centimeters_y, dpi, pol):
     # Load image
     #image = cv2.imread(image_path)
     #image = cv2.imdecode(np.frombuffer(image_bytes, np.uint8), cv2.IMREAD_COLOR)
@@ -216,9 +216,67 @@ def detect_rectangle_image(image_bytes, centimeters_x, centimeters_y, dpi):
     radius = int(radius)
 
     # Cálculo das coordenadas de corte
-    pixels_x = int(centimeters_x * dpi / 2.54)  # 2.54 cm por polegada
-    pixels_y = int(centimeters_y * dpi / 2.54)  # 2.54 cm por polegada
+    pixels_x = int(centimeters_x * dpi / pol)  # 2.54 cm por polegada
+    pixels_y = int(centimeters_y * dpi / pol)  # 2.54 cm por polegada
     
+    #center = (int(x), int(y))
+    left = int(center[0] - pixels_x / 2)
+    top = int(center[1] - pixels_y / 2)
+    right = int(center[0] + pixels_x / 2)
+    bottom = int(center[1] + pixels_y / 2)
+
+    # Corta a região de interesse da imagem nas dimensões desejadas
+    cropped_image = cropped_image[top:bottom, left:right]                                       # Crop the image to fit the circle
+
+    # with io.BytesIO() as output:
+    #     result_image.save(output, format="JPEG")
+    #     img_bytes = output.getvalue()
+    # return img_bytes
+
+    # Convert the result to PIL Image object 
+    result_image = Image.fromarray(cropped_image)
+    return result_image
+
+def detect_rectangle_image_bender(image_bytes, centimeters_x, centimeters_y, dpi, pol):
+    # Load image
+    #image = cv2.imread(image_path)
+    #image = cv2.imdecode(np.frombuffer(image_bytes, np.uint8), cv2.IMREAD_COLOR)
+    nparr = np.frombuffer(image_bytes.getvalue(), np.uint8)
+    image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    image = cv2.cvtColor(image , cv2.COLOR_BGR2RGB)
+
+    height, width = image.shape[:2]                                                 
+    if width > height:                                                             
+        image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)                            
+
+    x, y, w, h = 600, 400, 3500, 3700                                               
+    cropped_image = image[y:y+h, x:x+w] 
+
+    gray = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2GRAY)                                  # Convert image to grayscale
+    blur = cv2.medianBlur(gray, 11)                                                 # Apply median blur to the image
+    thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]    # Apply Otsu's threshold to the image
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=3)
+    thresh_image = cv2.adaptiveThreshold(opening, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
+
+    # Encontra os contornos na imagem
+    contours, hierarchy = cv2.findContours(thresh_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours = sorted(contours, key=cv2.contourArea, reverse=True)
+    largest_contour = contours[0]
+
+    # Aproxima o contorno para um círculo
+    (x, y), radius = cv2.minEnclosingCircle(largest_contour)
+    center = (int(x), int(y))
+    radius = int(radius)
+
+    # Conversão de centímetros para polegadas
+    inches_x = centimeters_x / pol
+    inches_y = centimeters_y / pol
+
+    # Cálculo do tamanho em pixels
+    pixels_x = int(inches_x * dpi)/2
+    pixels_y = int(inches_y * dpi)/2
+
     #center = (int(x), int(y))
     left = int(center[0] - pixels_x / 2)
     top = int(center[1] - pixels_y / 2)
@@ -324,8 +382,8 @@ def add_text_and_scale_circle(result, furo, testemunho, secao, amostra, dpi):
     draw = ImageDraw.Draw(img)
 
     # Define custom font style and font size
-    myFont_a = ImageFont.truetype('ARIAL.TTF', 86)
-    myFont = ImageFont.truetype('ARIALBD.TTF', 86)
+    myFont_a = ImageFont.truetype('./font/ARIAL.TTF', 86)
+    myFont = ImageFont.truetype('./font/ARIALBD.TTF', 86)
 
     # Define text to be added to the image
     texts = [
@@ -361,8 +419,8 @@ def add_text_and_scale_rectangle(result, furo, testemunho, secao, amostra, dpi):
     width, height = img.size
 
     # Define custom font style and font size
-    myFont_a = ImageFont.truetype('ARIAL.TTF', 76)
-    myFont = ImageFont.truetype('ARIALBD.TTF', 86)
+    myFont_a = ImageFont.truetype('./font/ARIAL.TTF', 76)
+    myFont = ImageFont.truetype('./font/ARIALBD.TTF', 86)
 
     # Define text to be added to the image
     texts = [
@@ -377,6 +435,44 @@ def add_text_and_scale_rectangle(result, furo, testemunho, secao, amostra, dpi):
 
     # Draw a rectangle with the specified coordinates
     x1, y1, x2, y2 = (width/2)-118, (height)-110, (width/2)+118, (height)+110
+    rec = ImageDraw.Draw(img)
+    rec.rectangle((x1, y1, x2, y2), fill='white')
+    #1797
+
+    # Scale
+    draw.text(((width/2)-80, height-90), "1 cm", font=myFont_a, fill='black')
+ 
+    # Save the edited image
+    buf = io.BytesIO()
+    img.save(buf, format='jpeg', dpi=(dpi, dpi), quality=95)
+    
+    return buf.getvalue()
+
+def add_text_and_scale_rectangle_bender(result, furo, testemunho, secao, amostra, dpi):
+    # Open an Image
+    img = result
+
+    # Create an ImageDraw object
+    draw = ImageDraw.Draw(img)
+    width, height = img.size
+
+    # Define custom font style and font size
+    myFont_a = ImageFont.truetype('./font/ARIAL.TTF', 76)
+    myFont = ImageFont.truetype('./font/ARIALBD.TTF', 86)
+
+    # Define text to be added to the image
+    texts = [
+        (furo, 50, 18),
+        (testemunho, 2970, 18),
+        (secao, 3240, 18),
+        (amostra, 3460, 18)
+    ]
+    # Add Text to an image
+    for value, x, y in texts:
+        draw.text((x, y), value, font=myFont, fill='white')
+
+    # Draw a rectangle with the specified coordinates
+    x1, y1, x2, y2 = (width/2)-212, (height)-110, (width/2)+212, (height)+110
     rec = ImageDraw.Draw(img)
     rec.rectangle((x1, y1, x2, y2), fill='white')
     #1797
@@ -411,8 +507,7 @@ def read_qr_code(image_buffer):
         return result
 
 def process_text_input(text_input):
-    num = 0
-    
+    num_image = ""
     text_input_list = text_input.split(",")
 
     if len(text_input_list) > 4:
@@ -420,9 +515,11 @@ def process_text_input(text_input):
         furo = text_input_list[0].split("\r\n")[1]
 
     elif len(text_input_list) == 4:
-        num = text_input_list[3]
-    
-    furo = text_input_list[0]
+        furo = text_input_list[0]
+        num_image = text_input_list[3]
+
+    elif len(text_input_list) == 3:
+        furo = text_input_list[0]
 
     testemunho = re.split(re.compile(r'[ABC]'), text_input_list[1])[0]
     amostra = re.split(re.compile(r'[ABC]'), text_input_list[1]) [1]
@@ -443,4 +540,4 @@ def process_text_input(text_input):
     
     TSA = text_input_list[1]
 
-    return (furo, testemunho, amostra, secao, ensaio, TSA, num)
+    return (furo, testemunho, amostra, secao, ensaio,TSA, num_image)
